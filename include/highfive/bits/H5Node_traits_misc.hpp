@@ -36,15 +36,55 @@ inline DataSet
 NodeTraits<Derivate>::createDataSet(const std::string& dataset_name,
                                     const DataSpace& space,
                                     const DataType& dtype) {
+
+    return createDataSet(dataset_name, space, dtype, H5P_DEFAULT);
+}
+
+template <typename Derivate>
+inline DataSet
+NodeTraits<Derivate>::createDataSet(const std::string& dataset_name,
+                                    const DataSpace& space,
+                                    const DataType& dtype,
+                                    hid_t& create_params) {
     DataSet set;
+
+    // Check that the id corresponds to a correctly typed property list
+    if(!H5Pequal(H5Pget_class(create_params), H5P_DATASET_CREATE) &&
+       !H5Pequal(create_params, H5P_DEFAULT)) {
+        throw DataSetException("Argument create_params was not a H5P_DATASET_CREATE plist.");
+    }
+
     if ((set._hid = H5Dcreate2(static_cast<Derivate*>(this)->getId(),
                                dataset_name.c_str(), dtype._hid, space._hid,
-                               H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
+                               H5P_DEFAULT, create_params, H5P_DEFAULT)) < 0) {
         HDF5ErrMapper::ToException<DataSetException>(
             std::string("Unable to create the dataset \"") + dataset_name +
             "\":");
     }
     return set;
+}
+
+template <typename Derivate>
+inline DataSet
+NodeTraits<Derivate>::createDataSet(const std::string& dataset_name,
+                                    const DataSpace& space,
+                                    const DataType& dtype,
+                                    const std::vector<size_t>& chunkdims) {
+
+    std::vector<hsize_t> real_chunkdims(chunkdims.size());
+    std::copy(chunkdims.begin(), chunkdims.end(), real_chunkdims.begin());
+
+    if(chunkdims.size() != space.getNumberDimensions()) {
+        throw DataSetException("Length of chunk dimensions does not match dataspace dimensions.");
+    }
+
+    // Set dataset creation properties to enable chunking
+    hid_t chunkparams = H5Pcreate(H5P_DATASET_CREATE);
+    if(H5Pset_chunk(chunkparams, int(chunkdims.size()), &(real_chunkdims.at(0))) < 0) {
+        HDF5ErrMapper::ToException<DataSpaceException>("Failed trying to create chunk.");
+    }
+
+    return createDataSet(dataset_name, space, dtype, chunkparams);
 }
 
 template <typename Derivate>

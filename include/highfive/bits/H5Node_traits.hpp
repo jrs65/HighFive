@@ -33,6 +33,33 @@ class NodeTraits {
     DataSet createDataSet(const std::string& dataset_name,
                           const DataSpace& space, const DataType& type);
 
+
+    ///
+    /// \brief createDataSet Create a new dataset in the current file of
+    /// datatype type and of size space with chunk dimensions chunkdims
+    /// \param dataset_name identifier of the dataset
+    /// \param space Associated DataSpace, see \ref DataSpace for more
+    /// informations
+    /// \param type Type of Data
+    /// \param chunkdims Size of chunks for the dataset
+    /// \return DataSet Object
+    DataSet createDataSet(const std::string& dataset_name,
+                          const DataSpace& space, const DataType& type,
+                          hid_t& create_params);
+
+    ///
+    /// \brief createDataSet Create a new dataset in the current file of
+    /// datatype type and of size space with chunk dimensions chunkdims
+    /// \param dataset_name identifier of the dataset
+    /// \param space Associated DataSpace, see \ref DataSpace for more
+    /// informations
+    /// \param type Type of Data
+    /// \param chunkdims Size of chunks for the dataset
+    /// \return DataSet Object
+    DataSet createDataSet(const std::string& dataset_name,
+                          const DataSpace& space, const DataType& type,
+                          const std::vector<size_t>& chunkdims);
+
     ///
     /// \brief createDataSet create a new dataset in the current file with a
     /// size specified by space

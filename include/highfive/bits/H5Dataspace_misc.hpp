@@ -30,6 +30,33 @@ inline DataSpace::DataSpace(const std::vector<size_t>& dims) {
     }
 }
 
+inline DataSpace::DataSpace(const std::vector<size_t>& dims,
+                            const std::vector<size_t>& maxdims) {
+    std::vector<hsize_t> real_dims(dims.size());
+    std::vector<hsize_t> real_maxdims(maxdims.size());
+
+    if(dims.size() != maxdims.size()) {
+        throw DataSpaceException("dims and maxdims must be the same length.");
+    }
+
+    std::copy(dims.begin(), dims.end(), real_dims.begin());
+
+    // Copy over the maximum dimension, converting any UNLIMITED dim
+    // appropriately
+    for(int i=0; i < dims.size(); i++) {
+        if(maxdims[i] == DataSpace::UNLIMITED) {
+            real_maxdims[i] = H5S_UNLIMITED;
+        } else {
+            real_maxdims[i] = maxdims[i];
+        }
+    }
+
+    if ((_hid = H5Screate_simple(int(dims.size()), &(real_dims.at(0)),
+                                 &(real_maxdims.at(0)))) < 0) {
+        throw DataSpaceException("Impossible to create dataspace");
+    }
+}
+
 inline DataSpace::DataSpace(const size_t dim1) {
     const hsize_t dims = hsize_t(dim1);
     if ((_hid = H5Screate_simple(1, &dims, NULL)) < 0) {
@@ -84,6 +111,18 @@ inline std::vector<size_t> DataSpace::getDimensions() const {
 
     std::vector<size_t> res(dims.size());
     std::copy(dims.begin(), dims.end(), res.begin());
+    return res;
+}
+
+inline std::vector<size_t> DataSpace::getMaxDimensions() const {
+    std::vector<hsize_t> maxdims(getNumberDimensions());
+    if (H5Sget_simple_extent_dims(_hid, NULL, &(maxdims[0])) < 0) {
+        HDF5ErrMapper::ToException<DataSetException>(
+            "Unable to get dataspace dimensions");
+    }
+
+    std::vector<size_t> res(maxdims.size());
+    std::copy(maxdims.begin(), maxdims.end(), res.begin());
     return res;
 }
 

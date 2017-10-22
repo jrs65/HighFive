@@ -53,6 +53,18 @@ inline DataSpace DataSet::getSpace() const {
 }
 
 inline DataSpace DataSet::getMemSpace() const { return getSpace(); }
+
+
+inline void DataSet::resize(const std::vector<size_t>& dims) {
+    std::vector<hsize_t> real_dims(dims.size());
+    std::copy(dims.begin(), dims.end(), real_dims.begin());
+
+    if(H5Dset_extent(getId(), &(real_dims.at(0))) < 0) {
+        HDF5ErrMapper::ToException<DataSetException>("Could not resize dataset.");
+    }
 }
+
+}
+
 
 #endif // H5DATASET_MISC_HPP
