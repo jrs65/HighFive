@@ -43,7 +43,7 @@ inline DataSpace::DataSpace(const std::vector<size_t>& dims,
 
     // Copy over the maximum dimension, converting any UNLIMITED dim
     // appropriately
-    for(int i=0; i < dims.size(); i++) {
+    for(size_t i=0; i < dims.size(); i++) {
         if(maxdims[i] == DataSpace::UNLIMITED) {
             real_maxdims[i] = H5S_UNLIMITED;
         } else {

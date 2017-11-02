@@ -45,12 +45,12 @@ inline DataSet
 NodeTraits<Derivate>::createDataSet(const std::string& dataset_name,
                                     const DataSpace& space,
                                     const DataType& dtype,
-                                    hid_t& create_params) {
+                                    hid_t create_params) {
     DataSet set;
 
     // Check that the id corresponds to a correctly typed property list
-    if(!H5Pequal(H5Pget_class(create_params), H5P_DATASET_CREATE) &&
-       !H5Pequal(create_params, H5P_DEFAULT)) {
+    if((create_params != H5P_DEFAULT) &&
+       !H5Pequal(H5Pget_class(create_params), H5P_DATASET_CREATE)) {
         throw DataSetException("Argument create_params was not a H5P_DATASET_CREATE plist.");
     }
 

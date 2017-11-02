@@ -45,7 +45,7 @@ class NodeTraits {
     /// \return DataSet Object
     DataSet createDataSet(const std::string& dataset_name,
                           const DataSpace& space, const DataType& type,
-                          hid_t& create_params);
+                          hid_t create_params);
 
     ///
     /// \brief createDataSet Create a new dataset in the current file of
