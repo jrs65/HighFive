@@ -38,6 +38,12 @@ class File : public Object,
     static const int Debug = 0x08;
     /// Open flag: Create non existing file
     static const int Create = 0x10;
+    /// Open flag: Create non existing file in SWMR mode
+    static const int SwmrCreate = 0x20;
+    /// Open flag: Open writer process on file in SWMR mode
+    static const int SwmrWrite = 0x40;
+    /// Open flag: Open reader process on file in SWMR mode
+    static const int SwmrRead = 0x80;
 
     ///
     /// \brief File

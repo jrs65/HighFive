@@ -32,6 +32,12 @@ inline int convert_open_flag(int openFlags) {
         res_open |= H5F_ACC_TRUNC;
     if (openFlags & File::Excl)
         res_open |= H5F_ACC_EXCL;
+    if (openFlags & File::SwmrCreate)
+        res_open |= H5F_ACC_SWMR_WRITE;
+    if (openFlags & File::SwmrWrite)
+        res_open |= H5F_ACC_SWMR_WRITE;
+    if (openFlags & File::SwmrRead)
+        res_open |= H5F_ACC_SWMR_READ;
     return res_open;
 }
 }
@@ -40,15 +46,15 @@ inline File::File(const std::string& filename, int openFlags,
                   const FileDriver& driver)
     : _filename(filename) {
 
-    openFlags = convert_open_flag(openFlags);
-
-    if (openFlags & H5F_ACC_CREAT) {
+    if ((openFlags & File::Create) | (openFlags & File::SwmrCreate)) {
+        openFlags = convert_open_flag(openFlags);
         if ((_hid = H5Fcreate(_filename.c_str(), openFlags & (H5F_ACC_TRUNC),
                               H5P_DEFAULT, driver.getId())) < 0) {
             HDF5ErrMapper::ToException<FileException>(
                 std::string("Unable to create file " + _filename));
         }
     } else {
+        openFlags = convert_open_flag(openFlags);
         if ((_hid = H5Fopen(_filename.c_str(), openFlags, driver.getId())) <
             0) {
             HDF5ErrMapper::ToException<FileException>(
