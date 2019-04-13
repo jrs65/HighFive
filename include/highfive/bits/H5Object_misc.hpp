@@ -11,6 +11,7 @@
 
 #include "../H5Exception.hpp"
 #include "../H5Object.hpp"
+#include <iostream>
 
 namespace HighFive {
 
